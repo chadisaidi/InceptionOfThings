@@ -1,0 +1,59 @@
+$controller = <<-'SCRIPT'
+apt-get update
+apt-get install -y curl
+
+curl -sfL https://get.k3s.io | sh -
+
+until kubectl get nodes > /dev/null 2>&1; do
+  sleep 2
+done
+
+# Make kubectl usable for vagrant user
+mkdir -p /home/vagrant/.kube
+cp /etc/rancher/k3s/k3s.yaml /home/vagrant/.kube/config
+chown -R vagrant:vagrant /home/vagrant/.kube
+
+cat /var/lib/rancher/k3s/server/node-token > /vagrant/node-token
+SCRIPT
+
+$agent = <<-'SCRIPT'
+apt-get update
+apt-get install -y curl
+
+until [ -f /vagrant/node-token ]; do
+  sleep 2
+done
+
+TOKEN=$(cat /vagrant/node-token)
+
+# Install K3s agent and join controller
+curl -sfL https://get.k3s.io | \
+  K3S_URL=https://192.168.56.110:6443 \
+  K3S_TOKEN="$TOKEN" sh -
+SCRIPT
+
+Vagrant.configure("2") do |config|
+
+  config.vm.box = "bento/ubuntu-24.04"
+
+  config.vm.define = "csaidiS" do |controller|
+    controller.vm.hostname = "csaidiS"
+    controller.vm.provider "virtualbox" do |vb|
+      vb.memory = "512" 
+      vb.cpus = 1
+    end
+    controller.vm.network "private_network", ip: 192.168.56.110
+    controller.vm.provision "shell", inline: $controller
+  end
+  
+  config.vm.define = "csaidiSW" do |agent|
+    agent.vm.hostname = "csaidiSW"
+    agent.vm.provider "virtualbox" do |vb|
+      vb.memory = "512" 
+      vb.cpus = 1
+    end
+    agent.vm.network "private_network", ip: 192.168.56.111
+    agent.vm.provision "shell", inline: $agent
+  end
+
+end

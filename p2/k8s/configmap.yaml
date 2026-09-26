@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-1-config
+data:
+  nginx.conf: |
+    events {}
+
+    http {
+      server {
+        listen 80;
+
+        location / {
+          root /usr/share/nginx/html;
+          index index.html;
+        }
+      }
+    }
+
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+      <body>
+        <h1>First app landing page</h1>
+        <p>Application 1</p>
+      </body>
+    </html>
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-2-config
+data:
+  nginx.conf: |
+    events {}
+
+    http {
+      server {
+        listen 80;
+
+        location / {
+          root /usr/share/nginx/html;
+          index index.html;
+        }
+      }
+    }
+
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+      <body>
+        <h1>First app landing page</h1>
+        <p>Application 2</p>
+      </body>
+    </html>
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-3-config
+data:
+  nginx.conf: |
+    events {}
+
+    http {
+      server {
+        listen 80;
+
+        location / {
+          root /usr/share/nginx/html;
+          index index.html;
+        }
+      }
+    }
+
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+      <body>
+        <h1>First app landing page</h1>
+        <p>Application 3</p>
+      </body>
+    </html>
